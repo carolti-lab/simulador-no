@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Nó — Vale para o seu negócio?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5F0E8;--cream-dark:#EDE7D9;--ink:#1A1714;--ink-soft:#4A4540;--ink-muted:#8A837A;--accent:#ba6a4a;--panel:#71806b;--sage:#71806b;--green:#2D6B4A;--border:rgba(26,23,20,0.12);}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+.page{max-width:680px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(186,106,74,.3);border-radius:100px;padding:4px 12px;margin-bottom:1.75rem}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,5.5vw,3rem);line-height:1.12;letter-spacing:-.01em;color:var(--ink);margin-bottom:.9rem;font-weight:400}
+h1 em{font-style:italic;color:var(--sage)}
+h1 strong{font-style:normal;color:var(--accent);font-weight:700}
+.subtitle{font-size:15px;font-weight:300;color:var(--ink-soft);line-height:1.7;margin-bottom:2rem;max-width:520px}
+.divider{height:1px;background:var(--border);margin:2rem 0}
+.section-label{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:1.25rem}
+.perfil-toggle{display:flex;margin-bottom:1.5rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content}
+.perfil-btn{padding:9px 20px;font-size:13px;font-weight:500;background:transparent;color:var(--ink-muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s}
+.perfil-btn.active{background:var(--ink);color:var(--cream)}
+.perfil-context{font-size:13px;color:var(--ink-muted);line-height:1.6;padding:12px 16px;background:var(--cream-dark);border-radius:8px;margin-bottom:1.75rem}
+.perfil-context strong{color:var(--ink-soft);font-weight:500}
+.sliders{display:flex;flex-direction:column;gap:1.5rem;margin-bottom:2rem}
+.slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem}
+.slider-name{font-size:14px;font-weight:400;color:var(--ink-soft)}
+.slider-val{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--ink);min-width:110px;text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ink);border:2px solid var(--cream);box-shadow:0 0 0 1px var(--ink);transition:transform .15s,background .15s}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15);background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.results{background:var(--panel);border-radius:16px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.results::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-bottom:1.5rem}
+.result-cell{background:rgba(255,255,255,.06);padding:1.25rem 1rem}
+.result-cell.full{grid-column:1/-1;background:rgba(255,255,255,.1)}
+.result-label{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.4rem;line-height:1.4}
+.result-value{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;line-height:1}
+.result-value.accent{color:#F5C4A8}
+.result-value.green{color:#AEDFC8}
+.result-value.big{font-size:2.1rem}
+.status-line{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.6)}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.breakdown{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);transition:background .15s}
+.breakdown-row:last-child{border-bottom:none}
+.breakdown-row:hover{background:var(--cream-dark)}
+.br-label{font-size:13px;color:var(--ink-soft)}
+.br-source{font-size:11px;color:var(--ink-muted);margin-top:2px}
+.br-val{font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.br-val.neg{color:var(--accent)}
+.br-val.total{font-family:'DM Serif Display',serif;font-size:1.1rem}
+.br-val.total.pos{color:var(--green)}
+.br-val.total.neg2{color:var(--accent)}
+.be-section{margin-bottom:2rem}
+.be-label-row{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-muted);margin-bottom:.5rem}
+.be-track{height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden;margin-bottom:.5rem}
+.be-fill{height:100%;border-radius:3px;transition:width .3s cubic-bezier(.4,0,.2,1)}
+.be-caption{font-size:12px;color:var(--ink-muted)}
+.cta-section{background:var(--panel);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;flex-wrap:wrap}
+.cta-title{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;font-weight:400;line-height:1.3;margin-bottom:.2rem}
+.cta-title em{font-style:italic;color:rgba(255,255,255,.7)}
+.cta-sub{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;background:var(--accent);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;border-radius:100px;text-decoration:none;white-space:nowrap}
+.cta-btn svg{width:16px;height:16px;flex-shrink:0}
+.note{font-size:12px;color:var(--ink-muted);line-height:1.6;border-top:1px solid var(--border);padding-top:1.5rem}
+.footer-brand{display:flex;align-items:center;gap:12px;margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.footer-logo{width:44px;height:44px;border-radius:10px;background:var(--accent);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.footer-logo img{width:34px;height:34px;object-fit:contain;display:block}
+.footer-name{font-family:'DM Serif Display',serif;font-size:14px;color:var(--ink);font-weight:400}
+.footer-tagline{font-size:11px;color:var(--ink-muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="badge"><span class="badge-dot"></span>Calculadora gratuita</div>
+<h1>Quantas horas você gastou<br>hoje <em>em planilha?</em><br>Com o <strong>Nó</strong>, isso acaba.</h1>
+<p class="subtitle">Ajuste os números do seu negócio e veja quanto o Nó pode gerar de retorno — em tempo, dinheiro e controle.</p>
+
+<div class="divider"></div>
+<p class="section-label">Quem faz a gestão hoje?</p>
+
+<div class="perfil-toggle">
+  <button class="perfil-btn active" onclick="setPerfil('dono')">Eu mesmo (dono)</button>
+  <button class="perfil-btn" onclick="setPerfil('func')">Uma funcionária</button>
+</div>
+
+<div class="perfil-context" id="ctx"></div>
+
+<p class="section-label">Seu negócio</p>
+<div class="sliders">
+  <div>
+    <div class="slider-top"><span class="slider-name">Faturamento mensal</span><span class="slider-val" id="v-fat">R$ 15.000</span></div>
+    <input type="range" min="3000" max="200000" step="1000" value="15000" id="fat" oninput="calc()">
+  </div>
+  <div id="sl-vh-wrap">
+    <div class="slider-top"><span class="slider-name">Quanto vale a sua hora</span><span class="slider-val" id="v-vh">R$ 40</span></div>
+    <input type="range" min="20" max="300" step="5" value="40" id="vh" oninput="calc()">
+  </div>
+  <div id="sl-sal-wrap" style="display:none">
+    <div class="slider-top"><span class="slider-name">Salário mensal da funcionária</span><span class="slider-val" id="v-sal">R$ 2.000</span></div>
+    <input type="range" min="1400" max="8000" step="100" value="2000" id="sal" oninput="calc()">
+  </div>
+  <div id="sl-hmes-wrap" style="display:none">
+    <div class="slider-top"><span class="slider-name">Carga horária mensal total</span><span class="slider-val" id="v-hmes">220 horas</span></div>
+    <input type="range" min="100" max="240" step="10" value="220" id="hmes" oninput="calc()">
+  </div>
+  <div>
+    <div class="slider-top"><span class="slider-name">Horas/mês gastas em gestão manual</span><span class="slider-val" id="v-hrs">20 horas</span></div>
+    <input type="range" min="4" max="360" step="4" value="20" id="hrs" oninput="calc()">
+  </div>
+  <div>
+    <div class="slider-top"><span class="slider-name">Desperdício estimado (% do faturamento)</span><span class="slider-val" id="v-desp">5%</span></div>
+    <input type="range" min="0" max="50" step="0.5" value="5" id="desp" oninput="calc()">
+  </div>
+  <div>
+    <div class="slider-top"><span class="slider-name">Ganho de produtividade esperado</span><span class="slider-val" id="v-prod">30%</span></div>
+    <input type="range" min="0" max="60" step="1" value="30" id="prod" oninput="calc()">
+    <div style="font-size:11px;color:var(--ink-muted);margin-top:6px;font-style:italic">Usuárias relatam até 60% de economia de tempo na gestão</div>
+  </div>
+</div>
+
+<div class="results">
+  <div class="results-grid">
+    <div class="result-cell">
+      <div class="result-label" id="lbl-r1">Custo do seu tempo perdido</div>
+      <div class="result-value green big" id="r-custo">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-label" id="lbl-r2">Potencial recuperado</div>
+      <div class="result-value accent big" id="r-potencial">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-label">Quanto você ganha p/ cada R$&nbsp;1 investido</div>
+      <div class="result-value" id="r-roi">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-label">Em quantos dias a assinatura se paga</div>
+      <div class="result-value" id="r-payback">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-label">Horas devolvidas por mês</div>
+      <div class="result-value" id="r-horas">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="result-label">Retorno líquido mensal</div>
+      <div class="result-value accent" id="r-liquido">—</div>
+    </div>
+  </div>
+  <div class="status-line">
+    <div class="status-dot" id="status-dot" style="background:#AEDFC8"></div>
+    <span id="status-text">—</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+<p class="section-label">De onde vem esse valor</p>
+
+<div class="breakdown">
+  <div class="breakdown-row">
+    <div><div class="br-label" id="bd-lbl1">Tempo do dono recuperado</div><div class="br-source" id="src-tempo">—</div></div>
+    <div class="br-val" id="br-tempo">—</div>
+  </div>
+  <div class="breakdown-row">
+    <div><div class="br-label">Redução de desperdício</div><div class="br-source" id="src-desp">—</div></div>
+    <div class="br-val" id="br-desp">—</div>
+  </div>
+  <div class="breakdown-row">
+    <div><div class="br-label">Ganho de faturamento</div><div class="br-source" id="src-prod">—</div></div>
+    <div class="br-val" id="br-prod">—</div>
+  </div>
+  <div class="breakdown-row">
+    <div><div class="br-label">Assinatura Nó</div><div class="br-source" id="assinatura-desc">plano mensal</div></div>
+    <div class="br-val neg" id="br-ticket">—</div>
+  </div>
+  <div class="breakdown-row">
+    <div><div class="br-label" style="font-weight:500;color:#1A1714">Retorno líquido mensal</div></div>
+    <div class="br-val total" id="br-total">—</div>
+  </div>
+</div>
+
+<div class="be-section">
+  <div class="be-label-row"><span>Ponto de equilíbrio</span><span id="be-right">—</span></div>
+  <div class="be-track"><div class="be-fill" id="be-fill" style="width:0%"></div></div>
+  <div class="be-caption" id="be-caption">—</div>
+</div>
+
+<div class="cta-section">
+  <div>
+    <div class="cta-title">Gostou do resultado?<br><em>A gente te mostra na prática.</em></div>
+    <div class="cta-sub">Fale com a gente — sem compromisso.</div>
+  </div>
+  <a class="cta-btn" id="cta-link" href="#" target="_blank">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.117 1.528 5.845L.057 23.571a.75.75 0 0 0 .92.92l5.726-1.471A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.705 9.705 0 0 1-4.95-1.355l-.355-.211-3.676.944.962-3.558-.231-.368A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
+    Falar no WhatsApp
+  </a>
+</div>
+
+<p class="note">Os valores são estimativas baseadas nos parâmetros que você fornece. O cálculo considera o custo proporcional do tempo em gestão, redução de desperdício e ganho de produtividade.</p>
+
+<div class="footer-brand">
+  <div class="footer-logo"><img src="data:image/png;base64,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" alt="Logo Nó"></div>
+  <div>
+    <div class="footer-name">Nó</div>
+    <div class="footer-tagline">doce gestão para confeitarias e padarias</div>
+  </div>
+</div>
+
+</div>
+<script>
+const WA = '5511995086264';
+let TICKET = 149.9;
+let perfil = 'dono';
+
+function getParam(name, fallback) {
+  try {
+    var u = new URLSearchParams(window.location.search);
+    var v = u.get(name);
+    return v !== null ? parseFloat(v) : fallback;
+  } catch(e) { return fallback; }
+}
+
+function initTicket() {
+  TICKET = getParam('plano', 149.9);
+  var fmt = 'R$ ' + TICKET.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('br-ticket').textContent = '− ' + fmt;
+  document.getElementById('assinatura-desc').textContent = 'plano mensal — ' + fmt;
+}
+
+function brl(v) {
+  return 'R$ ' + Math.abs(Math.round(v)).toLocaleString('pt-BR');
+}
+
+function track(el) {
+  var p = (+el.value - +el.min) / (+el.max - +el.min) * 100;
+  el.style.background = 'linear-gradient(to right,#1A1714 ' + p + '%,rgba(26,23,20,.12) ' + p + '%)';
+}
+
+function setPerfil(p) {
+  perfil = p;
+  var btns = document.querySelectorAll('.perfil-btn');
+  btns[0].classList.toggle('active', p === 'dono');
+  btns[1].classList.toggle('active', p === 'func');
+
+  document.getElementById('sl-vh-wrap').style.display  = p === 'dono' ? '' : 'none';
+  document.getElementById('sl-sal-wrap').style.display  = p === 'func' ? '' : 'none';
+  document.getElementById('sl-hmes-wrap').style.display = p === 'func' ? '' : 'none';
+
+  var slHrs = document.getElementById('hrs');
+  slHrs.max = p === 'dono' ? 360 : 240;
+  if (+slHrs.value > +slHrs.max) slHrs.value = slHrs.max;
+
+  if (p === 'dono') {
+    document.getElementById('ctx').innerHTML = '<strong>Seu tempo é o bem mais valioso.</strong> Cada hora que você gasta em planilha é uma hora a menos para vender, criar, ou simplesmente descansar. O Nó devolve esse tempo para você.';
+    document.getElementById('lbl-r1').textContent  = 'Custo do seu tempo perdido';
+    document.getElementById('lbl-r2').textContent  = 'Potencial recuperado';
+    document.getElementById('bd-lbl1').textContent = 'Tempo do dono recuperado';
+  } else {
+    document.getElementById('ctx').innerHTML = '<strong>O salário dela já é custo fixo — pago de qualquer forma.</strong> A questão é: o que ela poderia estar fazendo com o tempo que hoje vai para planilha? O Nó libera esse tempo para vender mais, atender melhor ou tirar a sobrecarga dos donos.';
+    document.getElementById('lbl-r1').textContent  = 'Custo do tempo perdido em planilha';
+    document.getElementById('lbl-r2').textContent  = 'Potencial do tempo liberado';
+    document.getElementById('bd-lbl1').textContent = 'Tempo da funcionária liberado';
+  }
+  calc();
+}
+
+function calc() {
+  var fat  = +document.getElementById('fat').value;
+  var hrs  = +document.getElementById('hrs').value;
+  var desp = +document.getElementById('desp').value / 100;
+  var prod = +document.getElementById('prod').value / 100;
+  var custoHora;
+
+  if (perfil === 'dono') {
+    var vh = +document.getElementById('vh').value;
+    custoHora = vh;
+    document.getElementById('v-vh').textContent = 'R$ ' + vh;
+    track(document.getElementById('vh'));
+    document.getElementById('src-tempo').textContent = hrs + ' h × R$ ' + vh + '/h';
+  } else {
+    var sal  = +document.getElementById('sal').value;
+    var hmes = +document.getElementById('hmes').value;
+    custoHora = sal / hmes;
+    document.getElementById('v-sal').textContent  = 'R$ ' + sal.toLocaleString('pt-BR');
+    document.getElementById('v-hmes').textContent = hmes + ' horas';
+    track(document.getElementById('sal'));
+    track(document.getElementById('hmes'));
+    document.getElementById('src-tempo').textContent = hrs + ' h × R$ ' + custoHora.toFixed(2) + '/h (proporcional ao salário)';
+  }
+
+  ['fat','hrs','desp','prod'].forEach(function(id) { track(document.getElementById(id)); });
+
+  document.getElementById('v-fat').textContent  = 'R$ ' + fat.toLocaleString('pt-BR');
+  document.getElementById('v-hrs').textContent  = hrs + ' horas';
+  document.getElementById('v-desp').textContent = (+document.getElementById('desp').value).toFixed(1) + '%';
+  document.getElementById('v-prod').textContent = (+document.getElementById('prod').value).toFixed(0) + '%';
+
+  var eH  = hrs * custoHora;
+  var eD  = fat * desp;
+  var gF  = fat * prod;
+  var tot = eH + eD + gF;
+  var liq = tot - TICKET;
+  var mult = tot / TICKET;
+  var pb  = tot > 0 ? Math.round(TICKET / tot * 30) : 999;
+
+  document.getElementById('r-custo').textContent    = brl(eH);
+  document.getElementById('r-potencial').textContent = brl(eD + gF);
+  document.getElementById('r-roi').textContent      = 'R$ ' + mult.toFixed(1) + ' de volta';
+  document.getElementById('r-payback').textContent  = pb <= 30 ? pb + ' dias' : '> 30 dias';
+  var horasDevolvidas = hrs * prod;
+  document.getElementById('r-horas').textContent = horasDevolvidas.toFixed(1).replace('.', ',') + ' h';
+  document.getElementById('r-liquido').textContent  = (liq >= 0 ? '+ ' : '− ') + brl(liq);
+
+  document.getElementById('br-tempo').textContent = brl(eH);
+  document.getElementById('src-desp').textContent = document.getElementById('desp').value + '% do faturamento';
+  document.getElementById('src-prod').textContent = document.getElementById('prod').value + '% de produtividade';
+  document.getElementById('br-desp').textContent  = brl(eD);
+  document.getElementById('br-prod').textContent  = brl(gF);
+
+  var bt = document.getElementById('br-total');
+  bt.textContent = (liq >= 0 ? '+ ' : '− ') + brl(liq);
+  bt.className = 'br-val total ' + (liq >= 0 ? 'pos' : 'neg2');
+
+  var maxB = Math.max(tot * 1.4, TICKET * 1.8);
+  var fp = Math.min(100, tot / maxB * 100);
+  var bf = document.getElementById('be-fill');
+  bf.style.width = fp + '%';
+  bf.style.background = liq >= 0 ? '#2D6B4A' : '#ba6a4a';
+  document.getElementById('be-right').textContent  = liq >= 0 ? 'atingido em ' + pb + ' dias' : 'ainda não atingido';
+  document.getElementById('be-caption').textContent = liq >= 0
+    ? 'A assinatura se paga em ' + pb + ' dias — o restante do mês é valor líquido gerado.'
+    : 'Faltam ' + brl(TICKET - tot) + '/mês para cobrir a assinatura.';
+
+  var dot = document.getElementById('status-dot');
+  var st  = document.getElementById('status-text');
+  if (liq >= 0) {
+    dot.style.background = '#AEDFC8';
+    st.textContent = 'Resultado positivo — o Nó gera ' + brl(liq) + ' líquido por mês.';
+  } else {
+    dot.style.background = '#F5C4A8';
+    st.textContent = 'Ainda abaixo do equilíbrio — ajuste os parâmetros.';
+  }
+
+  var msg = encodeURIComponent('Olá! Usei a calculadora do Nó e vi que posso gerar R$ ' + Math.round(tot).toLocaleString('pt-BR') + ' por mês. Quero saber mais!');
+  document.getElementById('cta-link').href = 'https://wa.me/' + WA + '?text=' + msg;
+}
+
+initTicket();
+setPerfil('dono');
+</script>
+</body>
+</html>
