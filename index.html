@@ -115,14 +115,10 @@ input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15);background:v
     <input type="range" min="4" max="360" step="4" value="20" id="hrs" oninput="calc()">
   </div>
   <div>
-    <div class="slider-top"><span class="slider-name">Desperdício estimado (% do faturamento)</span><span class="slider-val" id="v-desp">5%</span></div>
+    <div class="slider-top"><span class="slider-name">Desperdício estimado (perdeu ingrediente ou fez pedido errado esse mês? — % do faturamento)</span><span class="slider-val" id="v-desp">5%</span></div>
     <input type="range" min="0" max="50" step="0.5" value="5" id="desp" oninput="calc()">
   </div>
-  <div>
-    <div class="slider-top"><span class="slider-name">Ganho de produtividade esperado</span><span class="slider-val" id="v-prod">30%</span></div>
-    <input type="range" min="0" max="60" step="1" value="30" id="prod" oninput="calc()">
-    <div style="font-size:11px;color:var(--ink-muted);margin-top:6px;font-style:italic">Usuárias relatam até 60% de economia de tempo na gestão</div>
-  </div>
+
 </div>
 
 <div class="results">
@@ -146,6 +142,7 @@ input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15);background:v
     <div class="result-cell">
       <div class="result-label">Horas devolvidas por mês</div>
       <div class="result-value" id="r-horas">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:6px;font-style:italic;line-height:1.4">Usuárias relatam até 60% de economia de tempo na gestão</div>
     </div>
     <div class="result-cell">
       <div class="result-label">Retorno líquido mensal</div>
@@ -273,7 +270,7 @@ function calc() {
   var fat  = +document.getElementById('fat').value;
   var hrs  = +document.getElementById('hrs').value;
   var desp = +document.getElementById('desp').value / 100;
-  var prod = +document.getElementById('prod').value / 100;
+  var prod = 0.30; // fixo em 30% — baseado em relatos de usuárias
   var custoHora;
 
   if (perfil === 'dono') {
@@ -293,12 +290,11 @@ function calc() {
     document.getElementById('src-tempo').textContent = hrs + ' h × R$ ' + custoHora.toFixed(2) + '/h (proporcional ao salário)';
   }
 
-  ['fat','hrs','desp','prod'].forEach(function(id) { track(document.getElementById(id)); });
+  ['fat','hrs','desp'].forEach(function(id) { track(document.getElementById(id)); });
 
   document.getElementById('v-fat').textContent  = 'R$ ' + fat.toLocaleString('pt-BR');
   document.getElementById('v-hrs').textContent  = hrs + ' horas';
   document.getElementById('v-desp').textContent = (+document.getElementById('desp').value).toFixed(1) + '%';
-  document.getElementById('v-prod').textContent = (+document.getElementById('prod').value).toFixed(0) + '%';
 
   var eH  = hrs * custoHora;
   var eD  = fat * desp;
@@ -318,7 +314,7 @@ function calc() {
 
   document.getElementById('br-tempo').textContent = brl(eH);
   document.getElementById('src-desp').textContent = document.getElementById('desp').value + '% do faturamento';
-  document.getElementById('src-prod').textContent = document.getElementById('prod').value + '% de produtividade';
+  document.getElementById('src-prod').textContent = '30% de produtividade (premissa)';
   document.getElementById('br-desp').textContent  = brl(eD);
   document.getElementById('br-prod').textContent  = brl(gF);
 
